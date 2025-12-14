@@ -1,0 +1,4 @@
+# WASM support configuration
+# This enables the JavaScript backend for getrandom when targeting wasm32-unknown-unknown
+[target.wasm32-unknown-unknown]
+rustflags = ['--cfg', 'getrandom_backend="wasm_js"']

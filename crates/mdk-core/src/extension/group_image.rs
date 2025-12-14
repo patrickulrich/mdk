@@ -15,8 +15,9 @@ use chacha20poly1305::{
     aead::{Aead, KeyInit},
 };
 use hkdf::Hkdf;
-use nostr::secp256k1::rand::{RngCore, rngs::OsRng};
 use sha2::{Digest, Sha256};
+
+use crate::util::{random_12_bytes, random_32_bytes};
 
 use crate::media_processing::validation::validate_file_size;
 use crate::media_processing::{
@@ -132,11 +133,8 @@ pub enum GroupImageError {
 /// The image_seed is stored in the extension (as image_key field for backward compatibility).
 fn encrypt_group_image(image_data: &[u8]) -> Result<GroupImageEncrypted, GroupImageError> {
     // Generate random seed (v2) - this will be stored in extension as image_key
-    let mut rng = OsRng;
-    let mut image_seed = [0u8; 32];
-    let mut image_nonce = [0u8; 12];
-    rng.fill_bytes(&mut image_seed);
-    rng.fill_bytes(&mut image_nonce);
+    let image_seed = random_32_bytes();
+    let image_nonce = random_12_bytes();
 
     // Derive encryption key from seed using HKDF-Expand (v2)
     let hk = Hkdf::<Sha256>::new(None, &image_seed);
@@ -536,6 +534,7 @@ pub fn migrate_group_image_v1_to_v2(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use nostr::secp256k1::rand::{RngCore, rngs::OsRng};
 
     #[test]
     fn test_encrypt_decrypt_roundtrip() {

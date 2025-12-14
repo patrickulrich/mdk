@@ -15,6 +15,7 @@ keywords = ["nostr", "mls", "openmls"]
 default = []
 mip04 = []
 debug-examples = []
+wasm = []  # Enable WASM-compatible code paths
 
 [dependencies]
 hex = { workspace = true, features = ["std"] }
@@ -63,3 +64,8 @@ path = "examples/key_package_inspection.rs"
 name = "group_inspection"
 path = "examples/group_inspection.rs"
 required-features = ["debug-examples"]
+
+# WASM support - configure getrandom for wasm32-unknown-unknown
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+getrandom = { version = "0.3", features = ["wasm_js"] }
+openmls = { workspace = true, features = ["js"] }

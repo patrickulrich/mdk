@@ -21,7 +21,9 @@ use mdk_storage_traits::welcomes::types::{ProcessedWelcome, Welcome};
 use mdk_storage_traits::{Backend, MdkStorageProvider};
 use nostr::EventId;
 use openmls_memory_storage::MemoryStorage;
-use parking_lot::RwLock;
+
+mod sync;
+use sync::RwLock;
 
 mod groups;
 mod messages;

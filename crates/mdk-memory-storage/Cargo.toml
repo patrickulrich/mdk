@@ -11,12 +11,19 @@ readme = "README.md"
 rust-version = "1.90.0"
 keywords = ["nostr", "mls", "openmls", "memory"]
 
+[features]
+default = []
+wasm = []
+
 [dependencies]
 lru.workspace = true
 mdk-storage-traits.workspace = true
 nostr = { workspace = true, features = ["std"] }
 openmls.workspace = true
 openmls_memory_storage.workspace = true
+
+# Native-only: parking_lot for high-performance locking
+[target.'cfg(not(all(target_arch = "wasm32", target_os = "unknown")))'.dependencies]
 parking_lot.workspace = true
 
 [dev-dependencies]

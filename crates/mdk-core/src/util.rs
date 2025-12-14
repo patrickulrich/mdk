@@ -2,6 +2,7 @@ use mdk_storage_traits::groups::types::GroupExporterSecret;
 use nostr::base64::Engine;
 use nostr::base64::engine::general_purpose::STANDARD as BASE64;
 use nostr::nips::nip44;
+use nostr::secp256k1::rand::{RngCore, rngs::OsRng};
 use nostr::{Keys, SecretKey};
 use openmls::prelude::{Ciphersuite, ExtensionType};
 
@@ -153,6 +154,34 @@ pub(crate) fn decode_content(
             .map(|bytes| (bytes, "hex"))
             .map_err(|e| format!("Failed to decode {} as hex: {}", label, e)),
     }
+}
+
+// ============================================================================
+// RNG Utilities (WASM-compatible via getrandom)
+// ============================================================================
+
+/// Fill a byte slice with random bytes using the platform's secure RNG.
+/// Works on both native and WASM targets when getrandom is configured.
+#[inline]
+pub(crate) fn fill_random_bytes(dest: &mut [u8]) {
+    let mut rng = OsRng;
+    rng.fill_bytes(dest);
+}
+
+/// Generate a random 32-byte array (used for keys/seeds)
+#[inline]
+pub(crate) fn random_32_bytes() -> [u8; 32] {
+    let mut bytes = [0u8; 32];
+    fill_random_bytes(&mut bytes);
+    bytes
+}
+
+/// Generate a random 12-byte array (used for nonces)
+#[inline]
+pub(crate) fn random_12_bytes() -> [u8; 12] {
+    let mut bytes = [0u8; 12];
+    fill_random_bytes(&mut bytes);
+    bytes
 }
 
 #[cfg(test)]

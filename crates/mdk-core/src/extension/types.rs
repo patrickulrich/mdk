@@ -4,9 +4,9 @@
 use std::collections::BTreeSet;
 use std::str;
 
-use nostr::secp256k1::rand::Rng;
-use nostr::secp256k1::rand::rngs::OsRng;
 use nostr::{PublicKey, RelayUrl};
+
+use crate::util::random_32_bytes;
 use openmls::extensions::{Extension, ExtensionType};
 use openmls::group::{GroupContext, MlsGroup};
 use tls_codec::{
@@ -145,9 +145,7 @@ impl NostrGroupDataExtension {
         IR: IntoIterator<Item = RelayUrl>,
     {
         // Generate a random 32-byte group ID
-        let mut rng = OsRng;
-        let mut random_bytes = [0u8; 32];
-        rng.fill(&mut random_bytes);
+        let random_bytes = random_32_bytes();
 
         Self {
             version: Self::CURRENT_VERSION,
